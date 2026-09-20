@@ -7,8 +7,16 @@ const connectDB = require('./config/db');
 
 const app = express();
 
-// Connect Database
-connectDB();
+// Database connection middleware for serverless environment
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error('Database connection error in request:', err);
+    res.status(500).send('Database connection error');
+  }
+});
 
 // View engine setup (EJS)
 app.set('views', path.join(__dirname, 'views'));
@@ -107,28 +115,30 @@ app.use((err, req, res, next) => {
   res.status(500).send('Internal Server Error');
 });
 
-const PORT = process.env.PORT || 4000;
-const server = app.listen(PORT, () => {
-  console.log(`[EcoLoop Server]: Running on http://localhost:${PORT}`);
-});
+if (!process.env.VERCEL) {
+  const PORT = process.env.PORT || 4000;
+  const server = app.listen(PORT, () => {
+    console.log(`[EcoLoop Server]: Running on http://localhost:${PORT}`);
+  });
 
-// Handle server startup errors (e.g., EADDRINUSE)
-server.on('error', (err) => {
-  if (err.code === 'EADDRINUSE') {
-    console.error(`\n❌ [Port Conflict]: Port ${PORT} is already in use by another process.`);
-    console.error(`💡 Free the port by running: npx kill-port ${PORT}\n`);
-    process.exit(1);
-  } else {
-    console.error('Server error:', err);
-  }
-});
+  // Handle server startup errors (e.g., EADDRINUSE)
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`\n❌ [Port Conflict]: Port ${PORT} is already in use by another process.`);
+      console.error(`💡 Free the port by running: npx kill-port ${PORT}\n`);
+      process.exit(1);
+    } else {
+      console.error('Server error:', err);
+    }
+  });
 
-// Graceful shutdown listeners for nodemon and process restarts
-process.on('SIGINT', () => {
-  server.close(() => process.exit(0));
-});
-process.on('SIGTERM', () => {
-  server.close(() => process.exit(0));
-});
+  // Graceful shutdown listeners for nodemon and process restarts
+  process.on('SIGINT', () => {
+    server.close(() => process.exit(0));
+  });
+  process.on('SIGTERM', () => {
+    server.close(() => process.exit(0));
+  });
+}
 
 module.exports = app;
