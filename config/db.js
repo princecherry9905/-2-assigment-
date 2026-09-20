@@ -6,7 +6,7 @@ const connectDB = async () => {
       return mongoose.connection;
     }
 
-    const connStr = process.env.MONGODB_URI;
+    const connStr = process.env.MONGODB_URI || 'mongodb+srv://princecherry964_db_user:Cherry%409905%23@cluster0.oxxmbfk.mongodb.net/ecoloop?retryWrites=true&w=majority';
     
     // Attempt standard connection first
     if (connStr) {

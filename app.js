@@ -70,6 +70,14 @@ const adminRoutes = require('./routes/adminRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const realtimeStream = require('./utils/realtimeStream');
 
+// Handle HEAD requests gracefully for Vercel edge health checks
+app.use((req, res, next) => {
+  if (req.method === 'HEAD') {
+    return res.status(200).end();
+  }
+  next();
+});
+
 app.use('/', authRoutes);
 app.use('/citizen', citizenRoutes);
 app.use('/agent', agentRoutes);
