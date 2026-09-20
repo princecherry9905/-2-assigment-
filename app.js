@@ -13,8 +13,8 @@ app.use(async (req, res, next) => {
     await connectDB();
     next();
   } catch (err) {
-    console.error('Database connection error in request:', err);
-    res.status(500).send('Database connection error');
+    console.error('Database connection error in request:', err.message, err.stack);
+    res.status(500).send(`Database Connection Error: ${err.message}`);
   }
 });
 
