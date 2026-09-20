@@ -1,0 +1,106 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<main class="app-container">
+  <%- include('../partials/alerts') %>
+
+  <div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <h1 class="welcome-title">Manage Collection Agents</h1>
+      <p class="sub-title">View agent performance, assign pickup tasks, and register new collection agents</p>
+    </div>
+    <button class="btn btn-accent" onclick="toggleAddAgentForm()">
+      <i class="fa-solid fa-user-plus"></i> Register New Agent
+    </button>
+  </div>
+
+  <!-- ADD AGENT FORM (COLLAPSIBLE) -->
+  <div id="add-agent-card" class="content-card" style="display: none; background: #F8FAFC; border: 2px solid var(--primary-accent);">
+    <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem; color: var(--primary-dark);">
+      <i class="fa-solid fa-id-card"></i> Register New Collection Agent
+    </h3>
+
+    <form action="/admin/agent/create" method="POST">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" name="name" class="form-control" placeholder="e.g. Rahul Sharma" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" name="email" class="form-control" placeholder="e.g. rahul@ecoloop.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" name="password" class="form-control" placeholder="••••••••" required minlength="6">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input type="tel" name="phone" class="form-control" placeholder="e.g. +91 9876543210">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Assigned Area / Base Address</label>
+        <input type="text" name="address" class="form-control" placeholder="e.g. Sector 62, Noida / Ghaziabad Base">
+      </div>
+      <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+        <button type="button" class="btn btn-outline" onclick="toggleAddAgentForm()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Create Agent Account</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- AGENTS LIST -->
+  <div class="content-card">
+    <div class="card-title">
+      <span><i class="fa-solid fa-users"></i> Collection Agents List (<%= agents.length %>)</span>
+    </div>
+
+    <% if (agents.length === 0) { %>
+      <div style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted);">
+        <i class="fa-solid fa-user-gear" style="font-size: 2.5rem; color: #CBD5E1; margin-bottom: 0.5rem;"></i>
+        <p>No collection agents registered yet.</p>
+      </div>
+    <% } else { %>
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Agent Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Base Area</th>
+              <th>Total Assigned</th>
+              <th>Recycled Completed</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% agents.forEach(function(ag) { %>
+              <tr>
+                <td style="font-weight: 700; color: var(--primary-dark);">
+                  <i class="fa-solid fa-user-check"></i> <%= ag.name %>
+                </td>
+                <td><%= ag.email %></td>
+                <td><%= ag.phone || 'N/A' %></td>
+                <td><%= ag.address || 'General' %></td>
+                <td><strong><%= ag.assignedCount %></strong> Pickups</td>
+                <td><span style="color: var(--primary-accent-hover); font-weight: 700;"><%= ag.completedCount %></span> Recycled</td>
+                <td><span class="status-badge badge-recycled">Active</span></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</main>
+
+<script>
+  function toggleAddAgentForm() {
+    const card = document.getElementById('add-agent-card');
+    card.style.display = card.style.display === 'none' ? 'block' : 'none';
+  }
+</script>
+
+<%- include('../partials/footer') %>

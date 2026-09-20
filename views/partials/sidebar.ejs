@@ -1,0 +1,53 @@
+<aside class="sidebar">
+  <div>
+    <!-- LOGO -->
+    <a href="<%= user ? '/' + user.role + '/dashboard' : '/login' %>" class="sidebar-logo">
+      <div class="sidebar-logo-icon">♻</div>
+      <div>
+        EcoLoop
+        <span class="eco-tag">Clean & Green Future</span>
+      </div>
+    </a>
+
+    <!-- NAV MENU -->
+    <ul class="sidebar-menu">
+      <% if (user) { %>
+        <% if (user.role === 'citizen') { %>
+          <li><a href="/citizen/dashboard" class="sidebar-link active"><i class="fa-solid fa-gauge-high"></i> Dashboard</a></li>
+          <li><a href="/citizen/pickup/new" class="sidebar-link"><i class="fa-solid fa-circle-plus"></i> Schedule Pickup</a></li>
+          <li><a href="/citizen/pickups" class="sidebar-link"><i class="fa-solid fa-box-archive"></i> My Pickups</a></li>
+          <li><a href="/citizen/wallet" class="sidebar-link"><i class="fa-solid fa-wallet"></i> Eco Wallet</a></li>
+          <li><a href="/citizen/dashboard#achievements" class="sidebar-link"><i class="fa-solid fa-award"></i> Badges</a></li>
+          <li><a href="/citizen/leaderboard" class="sidebar-link"><i class="fa-solid fa-trophy"></i> Leaderboard</a></li>
+          <li><a href="/logout" class="sidebar-link" style="color: #EF4444; margin-top: 1rem;"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+        <% } else if (user.role === 'agent') { %>
+          <li><a href="/agent/dashboard" class="sidebar-link active"><i class="fa-solid fa-gauge-high"></i> Dashboard</a></li>
+          <li><a href="/agent/pickups" class="sidebar-link"><i class="fa-solid fa-boxes-packing"></i> Assigned Pickups</a></li>
+          <li><a href="/logout" class="sidebar-link" style="color: #EF4444; margin-top: 1rem;"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+        <% } else if (user.role === 'admin') { %>
+          <li><a href="/admin/dashboard" class="sidebar-link active"><i class="fa-solid fa-chart-pie"></i> Dashboard</a></li>
+          <li><a href="/admin/requests" class="sidebar-link"><i class="fa-solid fa-list-check"></i> Pickup Requests</a></li>
+          <li><a href="/admin/agents" class="sidebar-link"><i class="fa-solid fa-user-gear"></i> Agents</a></li>
+          <li><a href="/admin/centres" class="sidebar-link"><i class="fa-solid fa-recycle"></i> Centres</a></li>
+          <li><a href="/admin/categories" class="sidebar-link"><i class="fa-solid fa-tags"></i> Rates & Points</a></li>
+          <li><a href="/admin/statistics" class="sidebar-link"><i class="fa-solid fa-chart-column"></i> Analytics</a></li>
+          <li><a href="/logout" class="sidebar-link" style="color: #EF4444; margin-top: 1rem;"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+        <% } %>
+      <% } else { %>
+        <li><a href="/login" class="sidebar-link active"><i class="fa-solid fa-right-to-bracket"></i> Login</a></li>
+        <li><a href="/register" class="sidebar-link"><i class="fa-solid fa-user-plus"></i> Register</a></li>
+      <% } %>
+    </ul>
+  </div>
+
+  <!-- SIDEBAR BOTTOM ECO ARTWORK -->
+  <div class="sidebar-artwork">
+    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="42" fill="#A7F3D0" fill-opacity="0.6"/>
+      <circle cx="50" cy="50" r="32" fill="#34D399"/>
+      <path d="M50 25C36.1929 25 25 36.1929 25 50C25 63.8071 36.1929 75 50 75C63.8071 75 75 63.8071 75 50C75 36.1929 63.8071 25 50 25ZM50 68C40.0589 68 32 59.9411 32 50C32 40.0589 40.0589 32 50 32C59.9411 32 68 40.0589 68 50C68 59.9411 59.9411 68 50 68Z" fill="#047857"/>
+      <path d="M44 38L54 50L44 62" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <p>Recycle Today,<br><span style="color: #059669;">Save Tomorrow</span></p>
+  </div>
+</aside>

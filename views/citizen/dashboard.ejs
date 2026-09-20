@@ -1,0 +1,439 @@
+<%- include('../partials/header') %>
+
+<div class="app-wrapper">
+  <!-- SIDEBAR NAVIGATION -->
+  <%- include('../partials/sidebar') %>
+
+  <!-- MAIN WRAPPER -->
+  <div class="main-wrapper">
+    <!-- TOP HEADER -->
+    <%- include('../partials/navbar') %>
+
+    <main class="app-container">
+      <%- include('../partials/alerts') %>
+
+      <!-- DASHBOARD 2-COLUMN GRID LAYOUT MATCHING SCREENSHOT -->
+      <div class="dashboard-layout-grid">
+        
+        <!-- LEFT COLUMN (MAIN CONTENT) -->
+        <div>
+          <!-- HERO BANNER CARD WITH 3D ARTWORK -->
+          <div class="hero-banner-card">
+            <div class="hero-banner-content">
+              <h2>Recycle E-Waste<br>Build a Greener Future</h2>
+              <p>Turn your old electronics into rewards. Schedule doorstep pickup in minutes and earn cash + eco points!</p>
+              <a href="/citizen/pickup/new" class="btn btn-primary" style="padding: 0.8rem 1.75rem; font-size: 0.95rem;">
+                <i class="fa-solid fa-calendar-check"></i> Schedule Pickup Now
+              </a>
+            </div>
+            <div class="hero-banner-art">
+              <!-- 3D Eco Recycling Vector Art -->
+              <svg viewBox="0 0 220 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="110" cy="75" r="65" fill="#34D399" fill-opacity="0.25"/>
+                <circle cx="110" cy="75" r="48" fill="#10B981" fill-opacity="0.35"/>
+                <path d="M45 95L80 50L125 85L175 35" stroke="#6EE7B7" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+                <rect x="75" y="45" width="55" height="40" rx="8" fill="#064E3B" stroke="#A7F3D0" stroke-width="2"/>
+                <rect x="81" y="50" width="43" height="30" rx="4" fill="#6EE7B7"/>
+                <path d="M135 75C135 55 155 45 175 45C175 65 155 75 135 75Z" fill="#10B981"/>
+                <path d="M90 90C90 75 105 65 120 65C120 80 105 90 90 90Z" fill="#059669"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- ACTIVE PICKUP JOURNEY CARD -->
+          <div class="content-card">
+            <div class="card-title">
+              <div>
+                <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">ACTIVE PICKUP JOURNEY</span>
+                <div style="font-size: 1.15rem; font-weight: 800; color: var(--primary-dark); margin-top: 0.1rem;">
+                  Pickup ID: #<%= upcomingPickup ? upcomingPickup._id.toString().slice(-6).toUpperCase() : 'EW1024' %>
+                </div>
+              </div>
+              <% if (upcomingPickup) { %>
+                <a href="/citizen/pickup/<%= upcomingPickup._id %>" style="font-size: 0.85rem; color: var(--primary-accent-hover); font-weight: 700;">
+                  View Details &rarr;
+                </a>
+              <% } %>
+            </div>
+
+            <!-- DYNAMIC GRANULAR 8-STEP TIMELINE TRACK -->
+            <div style="overflow-x: auto; margin: 1.25rem 0;">
+              <%
+                const stepsList = [
+                  { name: 'Requested', time: '10:30 AM' },
+                  { name: 'Approved', time: '02:15 PM' },
+                  { name: 'Scheduled', time: '11:00 AM' },
+                  { name: 'Collected', time: '04:20 PM' },
+                  { name: 'At Centre', time: '' },
+                  { name: 'Sorting', time: '' },
+                  { name: 'Recycling', time: '' },
+                  { name: 'Recycled', time: '' }
+                ];
+                const curStatus = upcomingPickup ? upcomingPickup.status : 'Scheduled';
+                let curIndex = ['Requested', 'Approved', 'Scheduled', 'Collected', 'At Centre', 'Sorting', 'Recycling', 'Recycled'].indexOf(curStatus);
+                if (curIndex === -1) curIndex = 2;
+              %>
+              <div class="timeline-track-wrapper">
+                <% stepsList.forEach(function(stepObj, idx) { %>
+                  <% 
+                    let isCompleted = idx < curIndex || (curStatus === 'Recycled');
+                    let isActive = idx === curIndex && curStatus !== 'Recycled';
+                  %>
+                  <div class="timeline-step <%= isCompleted ? 'completed' : '' %> <%= isActive ? 'active' : '' %>">
+                    <div class="timeline-step-node">
+                      <% if (isCompleted) { %>
+                        ✓
+                      <% } else if (isActive) { %>
+                        ●
+                      <% } else { %>
+                        <%= idx + 1 %>
+                      <% } %>
+                    </div>
+                    <span class="timeline-step-label" style="<%= idx === 7 && isCompleted ? 'color: #047857; font-weight: 800;' : '' %>">
+                      <%= stepObj.name === 'Recycled' ? 'Completed' : stepObj.name %>
+                    </span>
+                    <% if (stepObj.time && (isCompleted || isActive)) { %>
+                      <span class="timeline-step-time"><%= stepObj.time %></span>
+                    <% } %>
+                  </div>
+                <% }); %>
+              </div>
+            </div>
+
+            <!-- PICKUP SUMMARY DETAILS ROW -->
+            <div style="background: #F8FAFC; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+              <div style="display: flex; gap: 1.75rem; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                  <span style="font-size: 1.6rem;">📱</span>
+                  <div>
+                    <div style="font-size: 0.85rem; font-weight: 800; color: var(--primary-dark);">Mobile Devices</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">2 items</div>
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                  <span style="font-size: 1.6rem;">🔌</span>
+                  <div>
+                    <div style="font-size: 0.85rem; font-weight: 800; color: var(--primary-dark);">Cables & Chargers</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">3 items</div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 1.75rem;">
+                <div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">Est. Weight</div>
+                  <div style="font-size: 1rem; font-weight: 800; color: var(--primary-dark);">5.0 KG</div>
+                </div>
+                <div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">Cash Reward</div>
+                  <div style="font-size: 1rem; font-weight: 800; color: #047857;">₹ 250</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- WHAT CAN YOU RECYCLE? CATEGORY GRID -->
+          <div class="content-card">
+            <div class="card-title">
+              <span>What Can You Recycle?</span>
+              <a href="/citizen/pickup/new" style="font-size: 0.85rem; color: var(--primary-accent-hover); font-weight: 700;">View All &rarr;</a>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">Select category to view live recycling rates & points</p>
+
+            <div class="category-cards-wrapper">
+              <a href="/citizen/pickup/new" class="category-mini-card">
+                <div class="icon-wrap">📱</div>
+                <div class="title">Mobiles</div>
+                <div class="rate">₹50 / kg • 🪙50</div>
+              </a>
+
+              <a href="/citizen/pickup/new" class="category-mini-card">
+                <div class="icon-wrap">💻</div>
+                <div class="title">Laptops</div>
+                <div class="rate">₹70 / kg • 🪙70</div>
+              </a>
+
+              <a href="/citizen/pickup/new" class="category-mini-card">
+                <div class="icon-wrap">🔋</div>
+                <div class="title">Batteries</div>
+                <div class="rate">₹30 / kg • 🪙30</div>
+              </a>
+
+              <a href="/citizen/pickup/new" class="category-mini-card">
+                <div class="icon-wrap">🔌</div>
+                <div class="title">Cables</div>
+                <div class="rate">₹15 / kg • 🪙20</div>
+              </a>
+
+              <a href="/citizen/pickup/new" class="category-mini-card">
+                <div class="icon-wrap">📷</div>
+                <div class="title">Appliances</div>
+                <div class="rate">₹20 / kg • 🪙60</div>
+              </a>
+            </div>
+          </div>
+
+          <!-- ENVIRONMENTAL IMPACT & ACHIEVEMENTS GRID -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.75rem;" class="responsive-grid">
+            
+            <!-- IMPACT CARD -->
+            <div class="content-card" id="impact">
+              <div class="card-title">
+                <span>🍃 Environmental Impact</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">This Month</span>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; margin-bottom: 1.1rem;">
+                <div style="background: #F8FAFC; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem; text-align: center;">
+                  <div style="font-size: 1.3rem; font-weight: 800; color: #047857;"><%= thisMonthWeight %> KG</div>
+                  <div style="font-size: 0.725rem; color: var(--text-muted); font-weight: 600;">Recycled</div>
+                </div>
+                <div style="background: #F8FAFC; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem; text-align: center;">
+                  <div style="font-size: 1.3rem; font-weight: 800; color: #3B82F6;"><%= co2Saved %> KG</div>
+                  <div style="font-size: 0.725rem; color: var(--text-muted); font-weight: 600;">CO₂ Saved</div>
+                </div>
+                <div style="background: #F8FAFC; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem; text-align: center;">
+                  <div style="font-size: 1.3rem; font-weight: 800; color: #059669;"><%= totalCollectedWeight %> KG</div>
+                  <div style="font-size: 0.725rem; color: var(--text-muted); font-weight: 600;">Total Lifetime</div>
+                </div>
+                <div style="background: #F8FAFC; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem; text-align: center;">
+                  <div style="font-size: 1.3rem; font-weight: 800; color: #10B981;"><%= treesEquivalent %></div>
+                  <div style="font-size: 0.725rem; color: var(--text-muted); font-weight: 600;">Trees Saved</div>
+                </div>
+              </div>
+
+              <div style="text-align: center; background: #ECFDF5; border-radius: var(--radius-md); padding: 0.75rem;">
+                <span style="font-weight: 800; font-size: 0.85rem; color: #047857;">🌍 You are making Ghaziabad greener!</span>
+              </div>
+            </div>
+
+            <!-- ACHIEVEMENTS BADGES GRID -->
+            <div class="content-card" id="achievements">
+              <div class="card-title">
+                <span>🎗 My Achievements</span>
+                <a href="#" style="font-size: 0.75rem; color: var(--primary-accent-hover); font-weight: 700;">View All</a>
+              </div>
+
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; text-align: center;">
+                <div style="background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: var(--radius-md); padding: 0.75rem 0.5rem;">
+                  <div style="font-size: 1.6rem; margin-bottom: 0.2rem;">🥇</div>
+                  <div style="font-size: 0.75rem; font-weight: 800; color: #065F46;">First Pickup</div>
+                  <div style="font-size: 0.65rem; color: #059669; font-weight: 700;">Unlocked</div>
+                </div>
+
+                <div style="background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: var(--radius-md); padding: 0.75rem 0.5rem;">
+                  <div style="font-size: 1.6rem; margin-bottom: 0.2rem;">🏆</div>
+                  <div style="font-size: 0.75rem; font-weight: 800; color: #065F46;">10 KG Club</div>
+                  <div style="font-size: 0.65rem; color: #059669; font-weight: 700;">+200 Pts</div>
+                </div>
+
+                <div style="background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: var(--radius-md); padding: 0.75rem 0.5rem;">
+                  <div style="font-size: 1.6rem; margin-bottom: 0.2rem;">🔋</div>
+                  <div style="font-size: 0.75rem; font-weight: 800; color: #065F46;">Battery Saver</div>
+                  <div style="font-size: 0.65rem; color: #059669; font-weight: 700;">Unlocked</div>
+                </div>
+
+                <div style="background: #F8FAFC; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem 0.5rem; opacity: 0.6;">
+                  <div style="font-size: 1.6rem; margin-bottom: 0.2rem;">🌱</div>
+                  <div style="font-size: 0.75rem; font-weight: 700; color: #64748B;">Green Citizen</div>
+                  <div style="font-size: 0.65rem; color: var(--text-muted);">(25 KG)</div>
+                </div>
+
+                <div style="background: #F8FAFC; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem 0.5rem; opacity: 0.6;">
+                  <div style="font-size: 1.6rem; margin-bottom: 0.2rem;">🛡️</div>
+                  <div style="font-size: 0.75rem; font-weight: 700; color: #64748B;">Eco Warrior</div>
+                  <div style="font-size: 0.65rem; color: var(--text-muted);">(100 KG)</div>
+                </div>
+
+                <div style="background: #F8FAFC; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem 0.5rem; opacity: 0.6;">
+                  <div style="font-size: 1.6rem; margin-bottom: 0.2rem;">👑</div>
+                  <div style="font-size: 0.75rem; font-weight: 700; color: #64748B;">Sustainability Hero</div>
+                  <div style="font-size: 0.65rem; color: var(--text-muted);">(200 KG)</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- RECENT PICKUPS TABLE -->
+          <div class="content-card">
+            <div class="card-title">
+              <span>Recent Pickups</span>
+              <a href="/citizen/pickups" style="font-size: 0.85rem; color: var(--primary-accent-hover); font-weight: 700;">View All</a>
+            </div>
+
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Pickup ID</th>
+                    <th>Items</th>
+                    <th>Weight</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="font-weight: 800;">#EW1024</td>
+                    <td>Mobile + Cables</td>
+                    <td>4.7 KG</td>
+                    <td><span class="status-badge badge-collected">Collected</span></td>
+                    <td>20 Sep 2026</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 800;">#EW0987</td>
+                    <td>Laptop</td>
+                    <td>3.2 KG</td>
+                    <td><span class="status-badge badge-recycled">Recycled</span></td>
+                    <td>15 Sep 2026</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 800;">#EW0765</td>
+                    <td>Batteries</td>
+                    <td>2.1 KG</td>
+                    <td><span class="status-badge badge-recycled">Recycled</span></td>
+                    <td>10 Sep 2026</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN SIDEBAR (STATS, WALLET, RANK, NOTIFICATIONS) -->
+        <div>
+          <!-- GREETING BOX -->
+          <div class="content-card">
+            <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--primary-dark);">Good Day,<br><%= user.name %> 👋</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.1rem;">Here is your sustainability overview</p>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; text-align: center;">
+              <div style="background: #F8FAFC; padding: 0.65rem 0.35rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                <div style="font-size: 1.15rem; font-weight: 800; color: var(--primary-dark);"><%= totalRequests %></div>
+                <div style="font-size: 0.65rem; color: var(--text-muted); font-weight: 700;">Pickups</div>
+              </div>
+              <div style="background: #F8FAFC; padding: 0.65rem 0.35rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                <div style="font-size: 1.15rem; font-weight: 800; color: #047857;"><%= totalCollectedWeight %> KG</div>
+                <div style="font-size: 0.65rem; color: var(--text-muted); font-weight: 700;">Recycled</div>
+              </div>
+              <div style="background: #F8FAFC; padding: 0.65rem 0.35rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                <div style="font-size: 1.15rem; font-weight: 800; color: var(--primary-accent-hover);"><%= walletBalance %></div>
+                <div style="font-size: 0.65rem; color: var(--text-muted); font-weight: 700;">Points</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ECO WALLET CARD -->
+          <div class="content-card">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+              <div style="width: 44px; height: 44px; background: #ECFDF5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">👛</div>
+              <div>
+                <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">ECO WALLET</div>
+                <div style="font-size: 1.45rem; font-weight: 800; color: var(--primary-dark);"><%= walletBalance %> Points</div>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin: 0.85rem 0; border-top: 1px solid var(--border-color); padding-top: 0.85rem;">
+              <span>Earned: <strong><%= totalEarned %></strong></span>
+              <span>Redeemed: <strong><%= totalRedeemed %></strong></span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-top: 0.85rem;">
+              <a href="/citizen/wallet" class="btn btn-primary btn-sm">Redeem</a>
+              <a href="/citizen/wallet" class="btn btn-outline btn-sm">History</a>
+            </div>
+          </div>
+
+          <!-- MONTHLY CHALLENGE CARD -->
+          <div class="content-card" id="challenge">
+            <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.6rem;">
+              <span style="font-size: 1.4rem;">🏆</span>
+              <div style="font-size: 0.95rem; font-weight: 800; color: var(--primary-dark);">Monthly Challenge</div>
+            </div>
+            <p style="font-size: 0.85rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 0.6rem;">Recycle 10 KG E-Waste</p>
+            
+            <div style="background: #E2E8F0; height: 10px; border-radius: 5px; overflow: hidden; margin-bottom: 0.5rem;">
+              <div style="background: var(--primary-accent); height: 100%; width: 85%;"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">
+              <span>Reward: <strong style="color: #047857;">+200 Points</strong></span>
+              <span>8.5 / 10 KG</span>
+            </div>
+          </div>
+
+          <!-- YOUR RANK CARD -->
+          <div class="content-card">
+            <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem;">
+              <span style="font-size: 1.4rem;">🥇</span>
+              <div style="font-size: 0.95rem; font-weight: 800; color: var(--primary-dark);">Your Rank</div>
+            </div>
+            <div style="font-size: 1.2rem; font-weight: 800; color: var(--primary-dark);">#<%= ecoRank %> in Ghaziabad</div>
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0.35rem 0 1rem;">You recycled more e-waste than <%= percentile %>% of users in your area.</p>
+
+            <a href="/citizen/leaderboard" class="btn btn-outline btn-sm" style="width: 100%;">View Leaderboard</a>
+          </div>
+
+          <!-- RECENT NOTIFICATIONS FEED -->
+          <div class="content-card">
+            <div class="card-title">
+              <span>🔔 Notifications</span>
+              <a href="/notifications/clear-all" style="font-size: 0.75rem; color: var(--primary-accent-hover); font-weight: 700;">Clear All</a>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.9rem;">
+              <% if (typeof notifications !== 'undefined' && notifications.length > 0) { %>
+                <% notifications.forEach(function(n) { %>
+                  <a href="/notifications/<%= n._id %>/read" style="display: flex; gap: 0.75rem; align-items: flex-start; text-decoration: none;">
+                    <div style="background: <%= n.type === 'reward' ? '#ECFDF5' : (n.type === 'success' ? '#D1FAE5' : '#DBEAFE') %>; color: <%= n.type === 'reward' ? '#047857' : (n.type === 'success' ? '#047857' : '#1E40AF') %>; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0; font-weight: 800;">
+                      <%= n.type === 'reward' ? '🪙' : (n.type === 'success' ? '✓' : '🔔') %>
+                    </div>
+                    <div>
+                      <div style="font-size: 0.825rem; font-weight: 800; color: var(--primary-dark);"><%= n.title %></div>
+                      <div style="font-size: 0.725rem; color: var(--text-muted); line-height: 1.3;"><%= n.message %></div>
+                      <div style="font-size: 0.65rem; color: #94A3B8; font-weight: 700; margin-top: 0.15rem;">
+                        <%= new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %>
+                      </div>
+                    </div>
+                  </a>
+                <% }); %>
+              <% } else { %>
+                <div style="text-align: center; padding: 1rem 0; color: var(--text-muted); font-size: 0.8rem;">
+                  No active notifications right now 🔔
+                </div>
+              <% } %>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+  function updateTimelineDynamic(newStatus) {
+    const stepsList = ['Requested', 'Approved', 'Scheduled', 'Collected', 'At Centre', 'Sorting', 'Recycling', 'Recycled'];
+    const curIndex = stepsList.indexOf(newStatus);
+    if (curIndex === -1) return;
+
+    const steps = document.querySelectorAll('.timeline-step');
+    steps.forEach((step, idx) => {
+      const node = step.querySelector('.timeline-step-node');
+      step.classList.remove('completed', 'active');
+
+      if (idx < curIndex || newStatus === 'Recycled') {
+        step.classList.add('completed');
+        if (node) node.textContent = '✓';
+      } else if (idx === curIndex && newStatus !== 'Recycled') {
+        step.classList.add('active');
+        if (node) node.textContent = '●';
+      } else {
+        if (node) node.textContent = idx + 1;
+      }
+    });
+  }
+</script>
+
+<%- include('../partials/footer') %>

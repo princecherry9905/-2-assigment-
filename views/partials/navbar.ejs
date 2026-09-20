@@ -1,0 +1,100 @@
+<header class="top-header">
+  <div class="header-search">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <input type="text" placeholder="Search e-waste categories, rates, pickup IDs...">
+    <span class="search-shortcut">⌘K</span>
+  </div>
+
+  <div class="header-right" style="position: relative;">
+    <% if (user) { %>
+      <% if (user.role === 'citizen') { %>
+        <!-- ECO WALLET QUICK PILL -->
+        <a href="/citizen/wallet" class="wallet-quick-pill" title="View Eco Wallet">
+          <span>🪙</span>
+          <span><%= typeof walletBalance !== 'undefined' ? walletBalance : (user.rewardPoints || 0) %> Pts</span>
+        </a>
+
+        <!-- QUICK SCHEDULE BUTTON -->
+        <a href="/citizen/pickup/new" class="btn btn-primary btn-sm">
+          <i class="fa-solid fa-plus"></i> Schedule Pickup
+        </a>
+      <% } %>
+
+      <!-- NOTIFICATION BELL WITH BADGE & DROPDOWN -->
+      <div style="position: relative;">
+        <div class="notification-bell" onclick="toggleNotifDropdown(event)" title="Notifications" style="cursor: pointer;">
+          <i class="fa-solid fa-bell"></i>
+          <% if (typeof unreadNotificationCount !== 'undefined' && unreadNotificationCount > 0) { %>
+            <span class="badge"><%= unreadNotificationCount %></span>
+          <% } %>
+        </div>
+
+        <!-- NOTIFICATION POPUP MENU -->
+        <div id="notifDropdown" style="display: none; position: absolute; right: 0; top: 50px; width: 340px; background: #FFFFFF; border: 1px solid var(--border-color); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); z-index: 999; padding: 1rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+            <span style="font-weight: 800; font-size: 0.9rem; color: var(--primary-dark);">Notifications</span>
+            <a href="/notifications/read-all" style="font-size: 0.725rem; font-weight: 700; color: var(--primary-accent-hover);">Mark all as read</a>
+          </div>
+
+          <div style="max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.6rem;">
+            <% if (typeof notifications !== 'undefined' && notifications.length > 0) { %>
+              <% notifications.forEach(function(n) { %>
+                <a href="/notifications/<%= n._id %>/read" style="display: block; padding: 0.6rem; border-radius: 8px; background: <%= n.isRead ? '#F8FAFC' : '#ECFDF5' %>; border: 1px solid <%= n.isRead ? '#E2E8F0' : '#A7F3D0' %>; transition: all 0.2s ease;">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <span style="font-weight: 800; font-size: 0.8rem; color: var(--primary-dark);"><%= n.title %></span>
+                    <% if (!n.isRead) { %>
+                      <span style="width: 8px; height: 8px; background: #10B981; border-radius: 50%; display: inline-block;"></span>
+                    <% } %>
+                  </div>
+                  <p style="font-size: 0.725rem; color: var(--text-muted); margin-top: 0.2rem; line-height: 1.3;"><%= n.message %></p>
+                </a>
+              <% }); %>
+            <% } else { %>
+              <div style="text-align: center; padding: 1.5rem 0; color: var(--text-muted); font-size: 0.8rem;">
+                No notifications right now 🔔
+              </div>
+            <% } %>
+          </div>
+
+          <div style="margin-top: 0.75rem; border-top: 1px solid var(--border-color); padding-top: 0.5rem; text-align: center;">
+            <a href="/notifications/clear-all" style="font-size: 0.725rem; color: #EF4444; font-weight: 700;">Clear All Notifications</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- USER PROFILE -->
+      <a href="<%= '/' + user.role + '/dashboard' %>" class="user-profile-btn">
+        <div class="user-avatar">
+          <%= user.name.charAt(0).toUpperCase() %>
+        </div>
+        <div style="text-align: left;">
+          <div style="font-weight: 800; font-size: 0.85rem; color: var(--primary-dark); line-height: 1.1;"><%= user.name %></div>
+          <span style="font-size: 0.65rem; font-weight: 700; color: var(--primary-accent-hover); text-transform: uppercase;"><%= user.role %></span>
+        </div>
+      </a>
+    <% } else { %>
+      <a href="/login" class="btn btn-outline btn-sm">Login</a>
+      <a href="/register" class="btn btn-primary btn-sm">Register</a>
+    <% } %>
+  </div>
+</header>
+
+<script>
+  function toggleNotifDropdown(e) {
+    if (e) e.stopPropagation();
+    const dd = document.getElementById('notifDropdown');
+    if (dd) {
+      dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+    }
+  }
+
+  document.addEventListener('click', function(e) {
+    const dd = document.getElementById('notifDropdown');
+    if (dd && dd.style.display === 'block') {
+      const bell = document.querySelector('.notification-bell');
+      if (!dd.contains(e.target) && !bell.contains(e.target)) {
+        dd.style.display = 'none';
+      }
+    }
+  });
+</script>

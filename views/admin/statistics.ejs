@@ -1,0 +1,155 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<main class="app-container">
+  <%- include('../partials/alerts') %>
+
+  <div class="dashboard-header">
+    <h1 class="welcome-title">Recycling Statistics & Analytics</h1>
+    <p class="sub-title">Detailed analytics on e-waste volume, category breakdown, area distribution, and collection metrics</p>
+  </div>
+
+  <!-- TOP STATS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon blue">
+        <i class="fa-solid fa-recycle"></i>
+      </div>
+      <div class="stat-info">
+        <h3><%= totalWeightCollected %> <span style="font-size: 1rem;">KG</span></h3>
+        <p>Total Weight Recycled</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon purple">
+        <i class="fa-solid fa-cubes"></i>
+      </div>
+      <div class="stat-info">
+        <h3><%= totalRequests %></h3>
+        <p>Total Requests Logged</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fa-solid fa-leaf"></i>
+      </div>
+      <div class="stat-info">
+        <h3><%= statusCounts.Recycled %></h3>
+        <p>Recycled Batches</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon amber">
+        <i class="fa-solid fa-truck-moving"></i>
+      </div>
+      <div class="stat-info">
+        <h3><%= statusCounts.Scheduled + statusCounts.Collected %></h3>
+        <p>In Logistics Pipeline</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;" class="responsive-grid">
+    <!-- CATEGORY-WISE BREAKDOWN -->
+    <div class="content-card">
+      <div class="card-title">
+        <span><i class="fa-solid fa-chart-bar"></i> E-Waste by Category</span>
+      </div>
+
+      <% if (categoryStats.length === 0) { %>
+        <p style="color: var(--text-muted); text-align: center; padding: 2rem 0;">No category statistics available.</p>
+      <% } else { %>
+        <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+          <% 
+            const maxCatWeight = Math.max(...categoryStats.map(c => c.totalWeight), 1);
+            categoryStats.forEach(function(cat) { 
+              const percentage = Math.round((cat.totalWeight / maxCatWeight) * 100);
+          %>
+            <div>
+              <div style="display: flex; justify-content: space-between; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.3rem;">
+                <span><%= cat.icon || '📱' %> <%= cat._id %></span>
+                <span><%= cat.totalWeight.toFixed(1) %> KG (<%= cat.count %> requests)</span>
+              </div>
+              <div style="background: #E2E8F0; height: 12px; border-radius: 6px; overflow: hidden;">
+                <div style="background: var(--primary-accent); height: 100%; width: <%= percentage %>%; border-radius: 6px; transition: width 0.5s ease;"></div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- AREA-WISE BREAKDOWN -->
+    <div class="content-card">
+      <div class="card-title">
+        <span><i class="fa-solid fa-map-location-dot"></i> E-Waste by Area / Region</span>
+      </div>
+
+      <% if (areaStats.length === 0) { %>
+        <p style="color: var(--text-muted); text-align: center; padding: 2rem 0;">No area distribution statistics available.</p>
+      <% } else { %>
+        <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+          <% 
+            const maxAreaWeight = Math.max(...areaStats.map(a => a.totalWeight), 1);
+            areaStats.forEach(function(area) { 
+              const percentage = Math.round((area.totalWeight / maxAreaWeight) * 100);
+          %>
+            <div>
+              <div style="display: flex; justify-content: space-between; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.3rem;">
+                <span>📍 <%= area._id %></span>
+                <span><%= area.totalWeight.toFixed(1) %> KG (<%= area.count %> pickups)</span>
+              </div>
+              <div style="background: #E2E8F0; height: 12px; border-radius: 6px; overflow: hidden;">
+                <div style="background: var(--primary-dark); height: 100%; width: <%= percentage %>%; border-radius: 6px; transition: width 0.5s ease;"></div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- STATUS BREAKDOWN GRID -->
+  <div class="content-card" style="margin-top: 1.5rem;">
+    <div class="card-title">
+      <span><i class="fa-solid fa-pie-chart"></i> Lifecycle Pipeline Status Breakdown</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; text-align: center;">
+      <div style="background: #DBEAFE; padding: 1rem; border-radius: 12px;">
+        <h4 style="font-size: 1.6rem; color: #1E40AF; font-weight: 800;"><%= statusCounts.Requested %></h4>
+        <p style="font-size: 0.8rem; font-weight: 700; color: #1E3A8A; text-transform: uppercase;">Requested</p>
+      </div>
+
+      <div style="background: #EDE9FE; padding: 1rem; border-radius: 12px;">
+        <h4 style="font-size: 1.6rem; color: #5B21B6; font-weight: 800;"><%= statusCounts.Approved %></h4>
+        <p style="font-size: 0.8rem; font-weight: 700; color: #4C1D95; text-transform: uppercase;">Approved</p>
+      </div>
+
+      <div style="background: #FEF3C7; padding: 1rem; border-radius: 12px;">
+        <h4 style="font-size: 1.6rem; color: #92400E; font-weight: 800;"><%= statusCounts.Scheduled %></h4>
+        <p style="font-size: 0.8rem; font-weight: 700; color: #78350F; text-transform: uppercase;">Scheduled</p>
+      </div>
+
+      <div style="background: #CFFAFE; padding: 1rem; border-radius: 12px;">
+        <h4 style="font-size: 1.6rem; color: #155E75; font-weight: 800;"><%= statusCounts.Collected %></h4>
+        <p style="font-size: 0.8rem; font-weight: 700; color: #164E63; text-transform: uppercase;">Collected</p>
+      </div>
+
+      <div style="background: #D1FAE5; padding: 1rem; border-radius: 12px;">
+        <h4 style="font-size: 1.6rem; color: #065F46; font-weight: 800;"><%= statusCounts.Recycled %></h4>
+        <p style="font-size: 0.8rem; font-weight: 700; color: #064E3B; text-transform: uppercase;">Recycled</p>
+      </div>
+
+      <div style="background: #FEE2E2; padding: 1rem; border-radius: 12px;">
+        <h4 style="font-size: 1.6rem; color: #991B1B; font-weight: 800;"><%= statusCounts.Rejected %></h4>
+        <p style="font-size: 0.8rem; font-weight: 700; color: #7F1D1D; text-transform: uppercase;">Rejected</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

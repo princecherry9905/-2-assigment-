@@ -1,0 +1,145 @@
+<%- include('../partials/header') %>
+
+<div class="app-wrapper">
+  <%- include('../partials/sidebar') %>
+
+  <div class="main-wrapper">
+    <%- include('../partials/navbar') %>
+
+    <main class="app-container" style="max-width: 800px;">
+      <%- include('../partials/alerts') %>
+
+      <div class="content-card" style="padding: 2.5rem 2.25rem;">
+        <div style="text-align: center; margin-bottom: 2rem;">
+          <div style="width: 54px; height: 54px; background: var(--primary-gradient); border-radius: var(--radius-md); color: #FFF; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; margin: 0 auto 0.75rem; box-shadow: var(--shadow-md);">
+            ♻
+          </div>
+          <h1 style="font-size: 1.85rem; font-weight: 800; color: var(--primary-dark); letter-spacing: -0.02em;">Schedule E-Waste Pickup</h1>
+          <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.25rem;">Select your e-waste items, specify weight, and choose a convenient pickup date.</p>
+        </div>
+
+        <form action="/citizen/pickup" method="POST" id="pickupForm">
+          <!-- CATEGORY SELECTION -->
+          <label class="form-label" style="font-size: 1rem; font-weight: 800; margin-bottom: 0.85rem; display: block; color: var(--primary-dark);">
+            1. Select E-Waste Category
+          </label>
+
+          <input type="hidden" name="categoryId" id="selectedCategoryInput" required>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 1rem; margin-bottom: 1.75rem;">
+            <% categories.forEach(function(cat, index) { %>
+              <div class="category-card-select <%= index === 0 ? 'selected' : '' %>" 
+                   data-id="<%= cat._id %>" 
+                   data-points="<%= cat.rewardPointsPerKg %>" 
+                   data-cash="<%= cat.pricePerKg || 20 %>"
+                   style="background: #F8FAFC; border: 2px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem 0.75rem; text-align: center; cursor: pointer; transition: var(--transition);">
+                <div style="font-size: 1.75rem; margin-bottom: 0.4rem;"><%= cat.icon || '📱' %></div>
+                <div style="font-size: 0.85rem; font-weight: 800; color: var(--primary-dark);"><%= cat.name %></div>
+                <div style="font-size: 0.7rem; font-weight: 700; color: var(--primary-accent-hover); margin-top: 0.2rem;">
+                  ₹<%= cat.pricePerKg || 20 %>/kg • 🪙<%= cat.rewardPointsPerKg %>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+
+          <label class="form-label" style="font-size: 1rem; font-weight: 800; margin-bottom: 0.85rem; display: block; color: var(--primary-dark);">
+            2. Details & Location
+          </label>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="quantity">Quantity (Number of Items)</label>
+              <input type="number" id="quantity" name="quantity" class="form-control" placeholder="e.g. 2" min="1" value="1" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="approximateWeight">Approximate Weight (KG)</label>
+              <input type="number" id="approximateWeight" name="approximateWeight" class="form-control" placeholder="e.g. 4.5" step="0.1" min="0.1" required>
+            </div>
+          </div>
+
+          <!-- REALTIME REWARD ESTIMATE CARD -->
+          <div style="background: linear-gradient(135deg, #ECFDF5 0%, #E6F4EA 100%); border: 1px solid #A7F3D0; border-radius: var(--radius-md); padding: 1.1rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <span style="font-size: 1.8rem;">🎁</span>
+              <div>
+                <div style="font-size: 0.75rem; font-weight: 800; color: #047857; text-transform: uppercase;">ESTIMATED REWARDS</div>
+                <div style="font-size: 1.15rem; font-weight: 800; color: var(--primary-dark);" id="rewardEstimateText">
+                  ₹ 0.00 Cash • 0 Eco Points
+                </div>
+              </div>
+            </div>
+            <span style="font-size: 0.75rem; color: #059669; font-weight: 700; background: #FFFFFF; padding: 0.3rem 0.75rem; border-radius: var(--radius-full);">Guaranteed Rewards</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="address">Pickup Address</label>
+            <textarea id="address" name="address" class="form-control" rows="3" placeholder="Door No, Street, Landmark, Area, City..." required><%= userAddress %></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="preferredDate">Preferred Pickup Date</label>
+            <input type="date" id="preferredDate" name="preferredDate" class="form-control" required>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem; padding: 0.9rem; font-weight: 800; font-size: 1rem;">
+            <i class="fa-solid fa-calendar-check"></i> Schedule Pickup Now
+          </button>
+        </form>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const dateInput = document.getElementById('preferredDate');
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    dateInput.value = tomorrow.toISOString().split('T')[0];
+    dateInput.min = new Date().toISOString().split('T')[0];
+
+    const cards = document.querySelectorAll('.category-card-select');
+    const hiddenInput = document.getElementById('selectedCategoryInput');
+    const weightInput = document.getElementById('approximateWeight');
+    const rewardEstimateText = document.getElementById('rewardEstimateText');
+
+    let currentCashPerKg = 20;
+    let currentPointsPerKg = 50;
+
+    function updateEstimate() {
+      const weight = parseFloat(weightInput.value) || 0;
+      const estCash = (weight * currentCashPerKg).toFixed(2);
+      const estPoints = Math.round(weight * currentPointsPerKg);
+      rewardEstimateText.textContent = `₹ ${estCash} Cash • ${estPoints} Eco Points`;
+    }
+
+    if (cards.length > 0) {
+      cards[0].style.borderColor = 'var(--primary-accent)';
+      cards[0].style.background = '#ECFDF5';
+      hiddenInput.value = cards[0].getAttribute('data-id');
+      currentCashPerKg = parseFloat(cards[0].getAttribute('data-cash')) || 20;
+      currentPointsPerKg = parseFloat(cards[0].getAttribute('data-points')) || 50;
+      updateEstimate();
+
+      cards.forEach(card => {
+        card.addEventListener('click', function() {
+          cards.forEach(c => {
+            c.style.borderColor = 'var(--border-color)';
+            c.style.background = '#F8FAFC';
+          });
+          this.style.borderColor = 'var(--primary-accent)';
+          this.style.background = '#ECFDF5';
+          hiddenInput.value = this.getAttribute('data-id');
+          currentCashPerKg = parseFloat(this.getAttribute('data-cash')) || 20;
+          currentPointsPerKg = parseFloat(this.getAttribute('data-points')) || 50;
+          updateEstimate();
+        });
+      });
+    }
+
+    weightInput.addEventListener('input', updateEstimate);
+  });
+</script>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,50 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<main class="app-container" style="max-width: 500px; padding-top: 3rem; padding-bottom: 3rem;">
+  <%- include('../partials/alerts') %>
+
+  <div class="content-card" style="padding: 2.75rem 2.25rem;">
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <div style="width: 60px; height: 60px; background: var(--primary-gradient); border-radius: var(--radius-md); color: #FFF; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 1rem; box-shadow: var(--shadow-md);">
+        ♻
+      </div>
+      <h2 style="font-weight: 800; font-size: 1.75rem; color: var(--primary-dark); letter-spacing: -0.02em;">Welcome Back</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem;">Sign in to your EcoLoop account</p>
+    </div>
+
+    <form action="/login" method="POST">
+      <div class="form-group">
+        <label class="form-label" for="email">Email Address</label>
+        <input type="email" id="email" name="email" class="form-control" placeholder="e.g. prince@ecoloop.com" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem; padding: 0.85rem; font-size: 0.95rem;">
+        Sign In <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 1.75rem; border-top: 1px solid var(--border-color); padding-top: 1.25rem;">
+      <p style="font-size: 0.875rem; color: var(--text-muted);">
+        Don't have an account? <a href="/register" style="color: var(--primary-accent-hover); font-weight: 800;">Register as Citizen &rarr;</a>
+      </p>
+    </div>
+
+    <!-- Quick Demo Accounts Box -->
+    <div style="margin-top: 1.5rem; background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: var(--radius-md); padding: 1rem; font-size: 0.8rem; color: #047857;">
+      <strong>🔑 Quick Demo Accounts (password: password123):</strong>
+      <div style="display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.5rem; font-weight: 600;">
+        <div>🧑‍💼 <strong>Citizen:</strong> prince@ecoloop.com</div>
+        <div>🚚 <strong>Agent:</strong> agent@ecoloop.com</div>
+        <div>👑 <strong>Admin:</strong> admin@ecoloop.com</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,80 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<main class="app-container">
+  <%- include('../partials/alerts') %>
+
+  <div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <h1 class="welcome-title">My Pickup Requests</h1>
+      <p class="sub-title">Track and view history of all your e-waste collection requests</p>
+    </div>
+    <a href="/citizen/pickup/new" class="btn btn-accent">
+      <i class="fa-solid fa-plus-circle"></i> New Pickup
+    </a>
+  </div>
+
+  <div class="content-card">
+    <% if (pickups.length === 0) { %>
+      <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+        <i class="fa-solid fa-truck-ramp-box" style="font-size: 3rem; color: #CBD5E1; margin-bottom: 1rem;"></i>
+        <h3>No Pickup Requests Found</h3>
+        <p style="margin-top: 0.25rem;">You haven't submitted any e-waste pickup requests yet.</p>
+        <a href="/citizen/pickup/new" class="btn btn-accent" style="margin-top: 1rem;">Schedule Your First Pickup</a>
+      </div>
+    <% } else { %>
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Request ID</th>
+              <th>Category</th>
+              <th>Quantity</th>
+              <th>Approx Weight</th>
+              <th>Preferred Date</th>
+              <th>Assigned Agent</th>
+              <th>Centre</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% pickups.forEach(function(p) { %>
+              <tr>
+                <td style="font-weight: 700; color: var(--primary-dark);">
+                  #<%= p._id.toString().slice(-6).toUpperCase() %>
+                </td>
+                <td style="font-weight: 600;">
+                  <%= p.category ? p.category.icon : '📱' %> <%= p.category ? p.category.name : 'N/A' %>
+                </td>
+                <td><%= p.quantity %> Items</td>
+                <td><strong><%= p.approximateWeight %> KG</strong></td>
+                <td><%= new Date(p.preferredDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) %></td>
+                <td>
+                  <% if (p.agent) { %>
+                    <span style="color: var(--primary-dark); font-weight: 600;"><i class="fa-solid fa-user-check"></i> <%= p.agent.name %></span>
+                  <% } else { %>
+                    <span style="color: var(--text-muted); font-style: italic;">Unassigned</span>
+                  <% } %>
+                </td>
+                <td><%= p.collectionCentre ? p.collectionCentre.name : 'Unassigned' %></td>
+                <td>
+                  <span class="status-badge badge-<%= p.status.toLowerCase() %>">
+                    <%= p.status %>
+                  </span>
+                </td>
+                <td>
+                  <a href="/citizen/pickup/<%= p._id %>" class="btn btn-outline btn-sm">
+                    Track & Details
+                  </a>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

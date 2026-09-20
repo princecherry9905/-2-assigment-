@@ -1,0 +1,51 @@
+<footer class="footer" style="text-align: center; padding: 2rem 0; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid var(--border-color); margin-top: 3rem;">
+  <div class="footer-content">
+    <p>&copy; <%= new Date().getFullYear() %> EcoLoop — E-Waste Collection & Recycling Pickup System. All rights reserved.</p>
+    <p style="margin-top: 0.25rem; font-size: 0.8rem; color: #64748B;">Request &rarr; Collect &rarr; Recycle &rarr; Reward &rarr; Repeat</p>
+  </div>
+</footer>
+
+<!-- 1-to-1 REALTIME LIVE STREAM SCRIPT (SSE) -->
+<script>
+  if (typeof(EventSource) !== "undefined") {
+    const evtSource = new EventSource("/api/live-stream");
+
+    evtSource.addEventListener("pickup_status_updated", function(e) {
+      try {
+        const data = JSON.parse(e.data);
+        console.log("⚡ 1-to-1 Live Event Received:", data);
+
+        // Create Live Toast Notification Banner
+        showRealtimeToast("⚡ Live Update: Pickup status changed to " + data.status + "!");
+
+        // Update Timeline step if on dashboard
+        if (typeof updateTimelineDynamic === "function") {
+          updateTimelineDynamic(data.status);
+        } else {
+          // Fallback auto-refresh timeline card after 1.5s
+          setTimeout(function() {
+            window.location.reload();
+          }, 1500);
+        }
+      } catch (err) {
+        console.error("Realtime event parse error:", err);
+      }
+    });
+
+    function showRealtimeToast(msg) {
+      const toast = document.createElement("div");
+      toast.style.cssText = "position: fixed; bottom: 25px; right: 25px; background: #064E3B; color: #FFFFFF; padding: 1rem 1.5rem; border-radius: 12px; font-weight: 800; font-size: 0.9rem; box-shadow: 0 10px 25px rgba(0,0,0,0.25); z-index: 99999; border: 2px solid #10B981; animation: slideIn 0.3s ease-out;";
+      toast.innerHTML = "🔔 " + msg;
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transition = "opacity 0.5s ease";
+        setTimeout(() => toast.remove(), 500);
+      }, 4000);
+    }
+  }
+</script>
+
+</body>
+</html>

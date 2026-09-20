@@ -1,0 +1,145 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<main class="app-container">
+  <%- include('../partials/alerts') %>
+
+  <div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <h1 class="welcome-title">E-Waste Categories & Reward Rates</h1>
+      <p class="sub-title">Maintain e-waste categories, descriptions, and Eco Points per KG reward configuration</p>
+    </div>
+    <button class="btn btn-accent" onclick="toggleAddCategoryForm()">
+      <i class="fa-solid fa-plus-circle"></i> Create New Category
+    </button>
+  </div>
+
+  <!-- ADD CATEGORY FORM -->
+  <div id="add-category-card" class="content-card" style="display: none; background: #F8FAFC; border: 2px solid var(--primary-accent);">
+    <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem; color: var(--primary-dark);">
+      <i class="fa-solid fa-tag"></i> Create E-Waste Category
+    </h3>
+
+    <form action="/admin/category/create" method="POST">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+        <div class="form-group">
+          <label class="form-label">Category Name</label>
+          <input type="text" name="name" class="form-control" placeholder="e.g. Laptops & Monitors" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Reward Points / KG</label>
+          <input type="number" name="rewardPointsPerKg" class="form-control" placeholder="e.g. 120" min="0" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cash Rate (₹) / KG</label>
+          <input type="number" name="pricePerKg" class="form-control" placeholder="e.g. 15" min="0" value="15" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Icon Emoji</label>
+          <input type="text" name="icon" class="form-control" placeholder="e.g. 💻" value="💻">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category Description</label>
+        <input type="text" name="description" class="form-control" placeholder="e.g. Personal computers, monitors, keyboards, laptops">
+      </div>
+      <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+        <button type="button" class="btn btn-outline" onclick="toggleAddCategoryForm()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Category</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- CATEGORIES TABLE -->
+  <div class="content-card">
+    <div class="card-title">
+      <span><i class="fa-solid fa-list-ol"></i> E-Waste Categories Catalogue (<%= categories.length %>)</span>
+    </div>
+
+    <% if (categories.length === 0) { %>
+      <div style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted);">
+        <p>No categories created yet.</p>
+      </div>
+    <% } else { %>
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Icon & Category</th>
+              <th>Description</th>
+              <th>Points Rate</th>
+              <th>Cash Rate (₹)</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% categories.forEach(function(cat) { %>
+              <tr>
+                <td style="font-size: 1.1rem; font-weight: 700; color: var(--primary-dark);">
+                  <span style="font-size: 1.5rem; vertical-align: middle; margin-right: 0.4rem;"><%= cat.icon || '📱' %></span>
+                  <%= cat.name %>
+                </td>
+                <td style="color: var(--text-muted); font-size: 0.9rem;"><%= cat.description || 'No description provided.' %></td>
+                <td>
+                  <span style="font-size: 1.1rem; font-weight: 800; color: var(--primary-accent-hover);">
+                    +<%= cat.rewardPointsPerKg %> Pts
+                  </span> / KG
+                </td>
+                <td>
+                  <span style="font-size: 1.1rem; font-weight: 800; color: #047857;">
+                    +₹<%= cat.pricePerKg || 15 %>
+                  </span> / KG
+                </td>
+                <td>
+                  <button class="btn btn-outline btn-sm" onclick="toggleEditCategory('<%= cat._id %>')">
+                    Edit Rates
+                  </button>
+                </td>
+              </tr>
+              <tr id="edit-cat-row-<%= cat._id %>" style="display: none; background: #F8FAFC;">
+                <td colspan="5" style="padding: 1rem;">
+                  <form action="/admin/category/<%= cat._id %>/edit" method="POST" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+                    <div>
+                      <label class="form-label">Name</label>
+                      <input type="text" name="name" class="form-control" value="<%= cat.name %>" required>
+                    </div>
+                    <div>
+                      <label class="form-label">Points / KG</label>
+                      <input type="number" name="rewardPointsPerKg" class="form-control" value="<%= cat.rewardPointsPerKg %>" required style="width: 100px;">
+                    </div>
+                    <div>
+                      <label class="form-label">Cash Rate (₹) / KG</label>
+                      <input type="number" name="pricePerKg" class="form-control" value="<%= cat.pricePerKg || 15 %>" required style="width: 100px;">
+                    </div>
+                    <div>
+                      <label class="form-label">Icon</label>
+                      <input type="text" name="icon" class="form-control" value="<%= cat.icon || '📱' %>" style="width: 80px;">
+                    </div>
+                    <div style="flex: 1;">
+                      <label class="form-label">Description</label>
+                      <input type="text" name="description" class="form-control" value="<%= cat.description %>">
+                    </div>
+                    <button type="submit" class="btn btn-accent btn-sm">Update</button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</main>
+
+<script>
+  function toggleAddCategoryForm() {
+    const card = document.getElementById('add-category-card');
+    card.style.display = card.style.display === 'none' ? 'block' : 'none';
+  }
+  function toggleEditCategory(id) {
+    const row = document.getElementById('edit-cat-row-' + id);
+    row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+  }
+</script>
+
+<%- include('../partials/footer') %>

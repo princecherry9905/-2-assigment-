@@ -1,0 +1,19 @@
+<% if (typeof success_msg !== 'undefined' && success_msg.length > 0) { %>
+  <div class="alert-container">
+    <% success_msg.forEach(function(msg) { %>
+      <div class="alert alert-success">
+        <span><i class="fa-solid fa-circle-check"></i> <%= msg %></span>
+      </div>
+    <% }) %>
+  </div>
+<% } %>
+
+<% if (typeof error_msg !== 'undefined' && error_msg.length > 0) { %>
+  <div class="alert-container">
+    <% error_msg.forEach(function(msg) { %>
+      <div class="alert alert-error">
+        <span><i class="fa-solid fa-triangle-exclamation"></i> <%= msg %></span>
+      </div>
+    <% }) %>
+  </div>
+<% } %>

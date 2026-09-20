@@ -1,0 +1,103 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<main class="app-container" style="max-width: 800px;">
+  <%- include('../partials/alerts') %>
+
+  <div style="margin-bottom: 1.5rem;">
+    <a href="/agent/pickups" style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600;">
+      &larr; Back to Assigned Pickups
+    </a>
+  </div>
+
+  <div class="content-card" style="padding: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+      <div>
+        <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary-accent-hover);">AGENT PICKUP INSPECTION</span>
+        <h1 style="font-size: 1.6rem; font-weight: 800; color: var(--primary-dark);">
+          Pickup #<%= pickup._id.toString().slice(-6).toUpperCase() %>
+        </h1>
+      </div>
+      <span class="status-badge badge-<%= pickup.status.toLowerCase() %>" style="font-size: 0.9rem; padding: 0.4rem 1rem;">
+        <%= pickup.status %>
+      </span>
+    </div>
+
+    <!-- UPDATE STATUS FORM -->
+    <div style="background: #F8FAFC; border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 14px; margin-bottom: 2rem;">
+      <h3 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 1rem; color: var(--primary-dark);">
+        <i class="fa-solid fa-pen-to-square"></i> Submit Status Update
+      </h3>
+      
+      <!-- Option A: Quick Action Submit Buttons -->
+      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.25rem;">
+        <form action="/agent/pickup/<%= pickup._id %>/status" method="POST" style="display: inline;">
+          <input type="hidden" name="status" value="Collected">
+          <button type="submit" class="btn btn-outline" <%= pickup.status === 'Collected' || pickup.status === 'Recycled' ? 'disabled' : '' %> style="background: #E0F2FE; color: #0369A1; border-color: #BAE6FD;">
+            <i class="fa-solid fa-truck-ramp-box"></i> 1. Submit as Collected
+          </button>
+        </form>
+
+        <form action="/agent/pickup/<%= pickup._id %>/status" method="POST" style="display: inline;">
+          <input type="hidden" name="status" value="Recycled">
+          <button type="submit" class="btn btn-accent" <%= pickup.status === 'Recycled' ? 'disabled' : '' %> style="font-weight: 700;">
+            <i class="fa-solid fa-leaf"></i> 2. Submit as Recycled & Pay Reward 💵
+          </button>
+        </form>
+      </div>
+
+      <!-- Option B: Dropdown Select Submit -->
+      <form action="/agent/pickup/<%= pickup._id %>/status" method="POST" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+        <div style="flex: 1; min-width: 220px;">
+          <label class="form-label" for="status">Or Select Status Manually</label>
+          <select name="status" id="status" class="form-select" required>
+            <option value="Scheduled" <%= pickup.status === 'Scheduled' ? 'selected' : '' %>>Scheduled (Pending Collection)</option>
+            <option value="Collected" <%= pickup.status === 'Collected' ? 'selected' : '' %>>Collected (Picked up from Citizen)</option>
+            <option value="Recycled" <%= pickup.status === 'Recycled' ? 'selected' : '' %>>Recycled (Sent to Recycling & Pay Cash/Points)</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.5rem; font-weight: 700;">
+          <i class="fa-solid fa-paper-plane"></i> Submit Status Update
+        </button>
+      </form>
+    </div>
+
+    <!-- CITIZEN & LOGISTICS DETAILS -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+      <div>
+        <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase;">
+          👤 Citizen Info
+        </h4>
+        <div style="background: #FFFFFF; border: 1px solid var(--border-color); padding: 1rem; border-radius: 10px;">
+          <p style="font-weight: 700; font-size: 1.1rem;"><%= pickup.citizen ? pickup.citizen.name : 'Unknown' %></p>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.2rem;">
+            📞 <%= pickup.citizen ? pickup.citizen.phone || 'No phone provided' : '' %><br>
+            ✉ <%= pickup.citizen ? pickup.citizen.email : '' %>
+          </p>
+          <p style="margin-top: 0.75rem; font-size: 0.9rem;">
+            <strong>📍 Address:</strong><br><%= pickup.address %>
+          </p>
+        </div>
+      </div>
+
+      <div>
+        <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase;">
+          📦 Item Details
+        </h4>
+        <div style="background: #FFFFFF; border: 1px solid var(--border-color); padding: 1rem; border-radius: 10px;">
+          <p style="font-weight: 700; font-size: 1.1rem; color: var(--primary-dark);">
+            <%= pickup.category ? pickup.category.icon : '📱' %> <%= pickup.category ? pickup.category.name : 'N/A' %>
+          </p>
+          <p style="margin-top: 0.4rem; font-size: 0.95rem;">
+            <strong>Quantity:</strong> <%= pickup.quantity %> Items<br>
+            <strong>Approx Weight:</strong> <%= pickup.approximateWeight %> KG<br>
+            <strong>Preferred Date:</strong> <%= new Date(pickup.preferredDate).toLocaleDateString() %><br>
+            <strong>Target Centre:</strong> <%= pickup.collectionCentre ? pickup.collectionCentre.name : 'Unassigned' %>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

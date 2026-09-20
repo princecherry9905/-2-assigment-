@@ -1,0 +1,132 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<main class="app-container" style="max-width: 860px;">
+  <%- include('../partials/alerts') %>
+
+  <!-- REWARD WALLET HERO -->
+  <div class="wallet-hero">
+    <div style="font-size: 2.2rem;">♻ My Eco & Cash Wallet</div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; text-align: center;">
+      <div style="background: rgba(255, 255, 255, 0.1); padding: 1.25rem; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.2);">
+        <div class="wallet-balance-num" style="font-size: 2.8rem; margin: 0;"><%= balance %></div>
+        <p style="text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; font-weight: 700; color: #A7F3D0; margin-top: 0.25rem;">Available Eco Points</p>
+      </div>
+
+      <div style="background: rgba(255, 255, 255, 0.1); padding: 1.25rem; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.2);">
+        <div class="wallet-balance-num" style="font-size: 2.8rem; margin: 0; color: #6EE7B7;">₹<%= typeof totalCashEarned !== 'undefined' ? totalCashEarned : '0.00' %></div>
+        <p style="text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; font-weight: 700; color: #6EE7B7; margin-top: 0.25rem;">Total Cash Rewards Earned 💵</p>
+      </div>
+    </div>
+
+    <div class="wallet-substats">
+      <div class="wallet-stat-item">
+        <h4 style="color: #A7F3D0;">+<%= totalEarned %> Pts</h4>
+        <p>Total Points Earned</p>
+      </div>
+      <div class="wallet-stat-item">
+        <h4 style="color: #6EE7B7;">+₹<%= typeof totalCashEarned !== 'undefined' ? totalCashEarned : '0.00' %></h4>
+        <p>Total Money Payout</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- REDEEM ECO POINTS VOUCHERS -->
+  <div class="content-card">
+    <div class="card-title">
+      <span>🎁 REDEEM ECO POINTS</span>
+      <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">Balance: <%= balance %> Pts</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+      <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; text-align: center; background: #FAFAFA;">
+        <div style="font-size: 2rem; margin-bottom: 0.3rem;">🛒</div>
+        <h4 style="font-size: 1rem; font-weight: 700;">₹100 Shopping Voucher</h4>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">Redeem for Amazon/Flipkart Gift Card</p>
+        <form action="/citizen/wallet/redeem" method="POST">
+          <input type="hidden" name="points" value="500">
+          <input type="hidden" name="description" value="₹100 Shopping Voucher">
+          <button type="submit" class="btn btn-accent btn-sm" <%= balance < 500 ? 'disabled' : '' %> style="width: 100%;">
+            Redeem 500 Pts
+          </button>
+        </form>
+      </div>
+
+      <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; text-align: center; background: #FAFAFA;">
+        <div style="font-size: 2rem; margin-bottom: 0.3rem;">🌱</div>
+        <h4 style="font-size: 1rem; font-weight: 700;">Plant a Real Tree</h4>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">Donate to NGO tree plantation drive</p>
+        <form action="/citizen/wallet/redeem" method="POST">
+          <input type="hidden" name="points" value="300">
+          <input type="hidden" name="description" value="Planted 1 Real Tree Drive">
+          <button type="submit" class="btn btn-accent btn-sm" <%= balance < 300 ? 'disabled' : '' %> style="width: 100%;">
+            Redeem 300 Pts
+          </button>
+        </form>
+      </div>
+
+      <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; text-align: center; background: #FAFAFA;">
+        <div style="font-size: 2rem; margin-bottom: 0.3rem;">🏷️</div>
+        <h4 style="font-size: 1rem; font-weight: 700;">₹250 Green Discount</h4>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">Coupon for eco-friendly products</p>
+        <form action="/citizen/wallet/redeem" method="POST">
+          <input type="hidden" name="points" value="1000">
+          <input type="hidden" name="description" value="₹250 Eco Store Discount Coupon">
+          <button type="submit" class="btn btn-accent btn-sm" <%= balance < 1000 ? 'disabled' : '' %> style="width: 100%;">
+            Redeem 1000 Pts
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRANSACTION HISTORY -->
+  <div class="content-card">
+    <div class="card-title">
+      <span><i class="fa-solid fa-list-ol"></i> Points & Money Transaction History</span>
+    </div>
+
+    <% if (rewards.length === 0) { %>
+      <div style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted);">
+        <i class="fa-solid fa-coins" style="font-size: 2.5rem; color: #CBD5E1; margin-bottom: 0.75rem;"></i>
+        <p>No reward transactions yet. Complete e-waste pickups to earn Eco Points & Money Rewards!</p>
+      </div>
+    <% } else { %>
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Description</th>
+              <th>Type</th>
+              <th>Eco Points</th>
+              <th>Money Reward</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% rewards.forEach(function(r) { %>
+              <tr>
+                <td><%= new Date(r.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) %></td>
+                <td style="font-weight: 600;"><%= r.description %></td>
+                <td>
+                  <span class="status-badge <%= r.type === 'Earned' ? 'badge-recycled' : 'badge-rejected' %>">
+                    <%= r.type %>
+                  </span>
+                </td>
+                <td style="font-size: 1.05rem; font-weight: 800; color: <%= r.type === 'Earned' ? 'var(--primary-accent-hover)' : '#EF4444' %>;">
+                  <%= r.type === 'Earned' ? '+' : '-' %><%= r.points %> Pts
+                </td>
+                <td style="font-size: 1.05rem; font-weight: 800; color: #047857;">
+                  +₹<%= r.cashAmount ? r.cashAmount.toFixed(2) : '0.00' %>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

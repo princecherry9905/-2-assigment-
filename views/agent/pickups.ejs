@@ -1,0 +1,81 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<main class="app-container">
+  <%- include('../partials/alerts') %>
+
+  <div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 class="welcome-title">Assigned Pickups</h1>
+      <p class="sub-title">Manage pickup requests assigned to you</p>
+    </div>
+
+    <!-- STATUS FILTER BUTTONS -->
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+      <a href="/agent/pickups" class="btn <%= selectedStatus === 'all' ? 'btn-primary' : 'btn-outline' %> btn-sm">All</a>
+      <a href="/agent/pickups?status=Scheduled" class="btn <%= selectedStatus === 'Scheduled' ? 'btn-primary' : 'btn-outline' %> btn-sm">Scheduled</a>
+      <a href="/agent/pickups?status=Collected" class="btn <%= selectedStatus === 'Collected' ? 'btn-primary' : 'btn-outline' %> btn-sm">Collected</a>
+      <a href="/agent/pickups?status=Recycled" class="btn <%= selectedStatus === 'Recycled' ? 'btn-primary' : 'btn-outline' %> btn-sm">Recycled</a>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <% if (pickups.length === 0) { %>
+      <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+        <i class="fa-solid fa-truck-pickup" style="font-size: 3rem; color: #CBD5E1; margin-bottom: 1rem;"></i>
+        <h3>No Assigned Pickups Found</h3>
+        <p>There are no pickups matching your selection.</p>
+      </div>
+    <% } else { %>
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Citizen Details</th>
+              <th>Category</th>
+              <th>Weight / Qty</th>
+              <th>Preferred Date</th>
+              <th>Address</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% pickups.forEach(function(p) { %>
+              <tr>
+                <td style="font-weight: 700; color: var(--primary-dark);">#<%= p._id.toString().slice(-6).toUpperCase() %></td>
+                <td>
+                  <strong><%= p.citizen ? p.citizen.name : 'Unknown' %></strong><br>
+                  <span style="font-size: 0.8rem; color: var(--text-muted);"><%= p.citizen ? p.citizen.phone : '' %></span>
+                </td>
+                <td><%= p.category ? p.category.icon : '📱' %> <%= p.category ? p.category.name : 'N/A' %></td>
+                <td><strong><%= p.approximateWeight %> KG</strong> (<%= p.quantity %> pcs)</td>
+                <td><%= new Date(p.preferredDate).toLocaleDateString() %></td>
+                <td style="max-width: 200px;"><%= p.address %></td>
+                <td>
+                  <span class="status-badge badge-<%= p.status.toLowerCase() %>"><%= p.status %></span>
+                </td>
+                <td>
+                  <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
+                    <a href="/agent/pickup/<%= p._id %>" class="btn btn-outline btn-sm">Details</a>
+                    <% if (p.status !== 'Recycled') { %>
+                      <form action="/agent/pickup/<%= p._id %>/status" method="POST" style="display: inline;">
+                        <input type="hidden" name="status" value="Recycled">
+                        <button type="submit" class="btn btn-accent btn-sm" title="Mark Recycled & Pay Citizen">
+                          <i class="fa-solid fa-check"></i> Submit Recycled
+                        </button>
+                      </form>
+                    <% } %>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

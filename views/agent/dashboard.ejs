@@ -1,0 +1,142 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<main class="app-container">
+  <%- include('../partials/alerts') %>
+
+  <div class="dashboard-header">
+    <h1 class="welcome-title">Welcome, Collection Agent <%= user.name %> 👋</h1>
+    <p class="sub-title">Collection Agent Portal — View, collect, and update e-waste pickup statuses</p>
+  </div>
+
+  <!-- AGENT STATS GRID -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon blue">
+        <i class="fa-solid fa-clipboard-check"></i>
+      </div>
+      <div class="stat-info">
+        <h3><%= assignedCount %></h3>
+        <p>Total Assigned</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon amber">
+        <i class="fa-solid fa-calendar-days"></i>
+      </div>
+      <div class="stat-info">
+        <h3><%= scheduledCount %></h3>
+        <p>Scheduled</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon purple">
+        <i class="fa-solid fa-truck-loading"></i>
+      </div>
+      <div class="stat-info">
+        <h3><%= collectedCount %></h3>
+        <p>Collected</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fa-solid fa-leaf"></i>
+      </div>
+      <div class="stat-info">
+        <h3><%= recycledCount %></h3>
+        <p>Recycled</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TODAY'S PICKUPS -->
+  <div class="content-card">
+    <div class="card-title">
+      <span><i class="fa-solid fa-calendar-day"></i> Today's Scheduled Pickups</span>
+      <span class="status-badge badge-scheduled"><%= todaysPickups.length %> Today</span>
+    </div>
+
+    <% if (todaysPickups.length === 0) { %>
+      <div style="text-align: center; padding: 2rem 1rem; color: var(--text-muted);">
+        <i class="fa-solid fa-calendar-xmark" style="font-size: 2.2rem; color: #CBD5E1; margin-bottom: 0.5rem;"></i>
+        <p>No pickups scheduled for today.</p>
+      </div>
+    <% } else { %>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+        <% todaysPickups.forEach(function(p) { %>
+          <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; background: #FAFAFA;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+              <span style="font-weight: 700; color: var(--primary-dark);">#<%= p._id.toString().slice(-6).toUpperCase() %></span>
+              <span class="status-badge badge-<%= p.status.toLowerCase() %>"><%= p.status %></span>
+            </div>
+            <h4 style="font-size: 1.1rem; margin-bottom: 0.25rem;">
+              <%= p.category ? p.category.icon : '📱' %> <%= p.category ? p.category.name : 'E-Waste' %>
+            </h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+              <%= p.quantity %> Items • ⚖ <%= p.approximateWeight %> KG
+            </p>
+            <p style="font-size: 0.85rem; margin-bottom: 0.75rem; color: var(--text-main);">
+              <strong>👤 Citizen:</strong> <%= p.citizen ? p.citizen.name : 'Unknown' %> (<%= p.citizen ? p.citizen.phone : '' %>)<br>
+              <strong>📍 Address:</strong> <%= p.address %>
+            </p>
+            <a href="/agent/pickup/<%= p._id %>" class="btn btn-primary btn-sm" style="width: 100%;">
+              View & Update Status
+            </a>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- ALL ASSIGNED PICKUPS -->
+  <div class="content-card">
+    <div class="card-title">
+      <span><i class="fa-solid fa-list"></i> Assigned Pickups Overview</span>
+      <a href="/agent/pickups" style="font-size: 0.85rem; color: var(--primary-accent-hover); font-weight: 600;">View All Assigned &rarr;</a>
+    </div>
+
+    <% if (recentAssigned.length === 0) { %>
+      <div style="text-align: center; padding: 2rem 1rem; color: var(--text-muted);">
+        <p>No pickups currently assigned to you.</p>
+      </div>
+    <% } else { %>
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Citizen</th>
+              <th>Category</th>
+              <th>Weight</th>
+              <th>Address</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% recentAssigned.forEach(function(p) { %>
+              <tr>
+                <td style="font-weight: 700;">#<%= p._id.toString().slice(-6).toUpperCase() %></td>
+                <td><%= p.citizen ? p.citizen.name : 'N/A' %></td>
+                <td><%= p.category ? p.category.icon : '📱' %> <%= p.category ? p.category.name : 'N/A' %></td>
+                <td><%= p.approximateWeight %> KG</td>
+                <td style="max-width: 220px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"><%= p.address %></td>
+                <td>
+                  <span class="status-badge badge-<%= p.status.toLowerCase() %>"><%= p.status %></span>
+                </td>
+                <td>
+                  <a href="/agent/pickup/<%= p._id %>" class="btn btn-outline btn-sm">Update</a>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

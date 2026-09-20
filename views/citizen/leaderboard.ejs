@@ -1,0 +1,59 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<main class="app-container" style="max-width: 860px;">
+  <%- include('../partials/alerts') %>
+
+  <div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 class="welcome-title">🏆 City Eco Leaderboard</h1>
+      <p class="sub-title">Top environmental recyclers ranked by total e-waste recycled & Eco Points</p>
+    </div>
+    <div style="background: #ECFDF5; border: 1px solid #A7F3D0; padding: 0.5rem 1rem; border-radius: 12px;">
+      <span style="font-size: 0.8rem; font-weight: 700; color: #047857;">YOUR CITY RANK</span>
+      <h3 style="font-size: 1.4rem; color: #065F46; font-weight: 800; margin: 0;">#<%= userRank %> in Ghaziabad</h3>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <div class="table-responsive">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Citizen</th>
+            <th>Area / City</th>
+            <th>Total Recycled</th>
+            <th>Pickups</th>
+            <th>Eco Points</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% rankings.forEach(function(r, index) { %>
+            <tr style="<%= r.userId === user._id.toString() ? 'background-color: #ECFDF5; font-weight: 700;' : '' %>">
+              <td style="font-size: 1.2rem; font-weight: 800; color: var(--primary-dark);">
+                <% if (index === 0) { %> 🥇 #1
+                <% } else if (index === 1) { %> 🥈 #2
+                <% } else if (index === 2) { %> 🥉 #3
+                <% } else { %> #<%= index + 1 %>
+                <% } %>
+              </td>
+              <td>
+                <strong style="color: var(--primary-dark);"><%= r.name %></strong>
+                <% if (r.userId === user._id.toString()) { %>
+                  <span class="role-pill" style="font-size: 0.65rem; margin-left: 0.3rem;">YOU</span>
+                <% } %>
+              </td>
+              <td style="color: var(--text-muted);"><%= r.address %></td>
+              <td><strong style="color: #047857;"><%= r.totalWeight.toFixed(1) %> KG</strong></td>
+              <td><%= r.totalPickups %> Pickups</td>
+              <td style="font-weight: 800; color: var(--primary-accent-hover);">+<%= r.totalPoints %> Pts</td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

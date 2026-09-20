@@ -1,0 +1,60 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<main class="app-container" style="max-width: 520px;">
+  <%- include('../partials/alerts') %>
+
+  <div class="content-card" style="padding: 2.5rem 2rem;">
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <div style="font-size: 2.8rem; margin-bottom: 0.25rem;">♻</div>
+      <h2 style="font-weight: 800; font-size: 1.6rem; color: var(--primary-dark);">Join EcoLoop</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">Recycle e-waste from your home & earn reward points</p>
+    </div>
+
+    <form action="/register" method="POST">
+      <div class="form-group">
+        <label class="form-label" for="name">Full Name</label>
+        <input type="text" id="name" name="name" class="form-control" placeholder="e.g. Prince Kumar" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="email">Email Address</label>
+        <input type="email" id="email" name="email" class="form-control" placeholder="e.g. prince@example.com" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="phone">Phone Number</label>
+        <input type="tel" id="phone" name="phone" class="form-control" placeholder="e.g. +91 9876543210">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="address">Pickup Address</label>
+        <textarea id="address" name="address" class="form-control" rows="2" placeholder="House/Office No., Street, Sector, Area, City"></textarea>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required minlength="6">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="••••••••" required minlength="6">
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-accent" style="width: 100%; margin-top: 1rem; padding: 0.85rem; font-weight: 700;">
+        Create Citizen Account <i class="fa-solid fa-user-plus"></i>
+      </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1.25rem;">
+      <p style="font-size: 0.9rem; color: var(--text-muted);">
+        Already have an account? <a href="/login" style="color: var(--primary-dark); font-weight: 700;">Log in here</a>
+      </p>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>
